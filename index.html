@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<title>LEGION TP</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --red:#ef1010;
+  --red2:#ff3030;
+  --dark:#15171b;
+  --dark2:#22252b;
+  --bg:#f4f5f7;
+  --card:#fff;
+  --text:#17191d;
+  --muted:#7c828c;
+  --green:#1faa59;
+  --line:#e7e8eb;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.app{min-height:100vh;max-width:620px;margin:0 auto;background:var(--bg)}
+.header{
+  color:#fff;background:linear-gradient(135deg,#c90000,#ff1717);
+  padding:calc(14px + env(safe-area-inset-top)) 18px 18px;
+  border-radius:0 0 26px 26px;
+  box-shadow:0 8px 24px rgba(210,0,0,.22)
+}
+.header-row{display:flex;align-items:center;justify-content:space-between}
+.logo{width:128px;height:auto;display:block;filter:brightness(0) invert(1)}
+.bell{width:40px;height:40px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);border-radius:14px;color:#fff;font-size:20px}
+.greeting{margin-top:20px;font-size:26px;font-weight:800;line-height:1.08}
+.user{margin-top:6px;font-size:14px;opacity:.88}
+.status{
+  margin-top:18px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.16);
+  border-radius:18px;padding:13px 14px;display:flex;align-items:center;justify-content:space-between
+}
+.status-left{display:flex;align-items:center;gap:10px}.dot{width:11px;height:11px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.12)}
+.status-title{font-weight:700}.status-time{font-size:12px;opacity:.8}
+.content{padding:18px 14px 100px}
+.section-title{font-size:13px;font-weight:800;color:#777e89;text-transform:uppercase;letter-spacing:.08em;margin:4px 4px 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{
+  border:1px solid var(--line);background:var(--card);border-radius:22px;padding:17px 15px;
+  box-shadow:0 5px 18px rgba(20,24,32,.06);min-height:128px;display:flex;flex-direction:column;justify-content:space-between
+}
+.card .icon{width:44px;height:44px;border-radius:15px;background:#fff0f0;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:23px}
+.card h3{margin:13px 0 0;font-size:16px}.card p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.card:active{transform:scale(.985)}
+.card-wide{grid-column:1/-1;min-height:108px;display:flex;flex-direction:row;align-items:center;gap:14px}
+.card-wide .icon{flex:0 0 50px}
+.sales{
+  margin-top:12px;background:var(--dark);color:#fff;border-radius:22px;padding:17px;
+  box-shadow:0 8px 22px rgba(0,0,0,.12)
+}
+.sales-head{display:flex;justify-content:space-between;align-items:center}.sales-title{font-weight:800}.sales-link{font-size:12px;color:#ff8c8c}
+.metrics{display:grid;grid-template-columns:1fr 1fr;margin-top:16px;gap:10px}.metric{background:#292d34;border-radius:15px;padding:12px}.metric b{display:block;font-size:23px}.metric span{font-size:11px;color:#aeb4bd}
+.footer{text-align:center;color:#9aa0a9;font-size:11px;margin-top:20px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.52);display:none;align-items:flex-end;z-index:30}
+.sheet{width:100%;max-width:620px;margin:0 auto;background:#fff;border-radius:25px 25px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h2{margin:0 0 8px}.sheet p{color:var(--muted);font-size:13px}.actions{display:grid;gap:10px;margin-top:16px}
+.action{border:0;border-radius:16px;padding:15px;font-weight:800;font-size:15px}.primary{background:var(--red);color:#fff}.secondary{background:#f0f1f3;color:#222}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-row">
+      <img class="logo" src="legion-logo.png" alt="LEGION ASIA DISTRIBUTION">
+      <button class="bell" id="bell">🔔</button>
+    </div>
+    <div class="greeting">Добрый день</div>
+    <div class="user" id="user">Торговый представитель</div>
+    <div class="status">
+      <div class="status-left"><span class="dot"></span><div><div class="status-title" id="statusTitle">Рабочий день не начат</div><div class="status-time" id="statusTime">Готов к работе</div></div></div>
+      <span>●</span>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="section-title">Работа</div>
+    <div class="grid">
+      <button class="card" id="start">
+        <div class="icon">▶</div><div><h3>Начать работу</h3><p>Фото и геолокация</p></div>
+      </button>
+      <button class="card" id="finish">
+        <div class="icon">■</div><div><h3>Завершить</h3><p>Фото и геолокация</p></div>
+      </button>
+      <button class="card" id="qr">
+        <div class="icon">▦</div><div><h3>Сканер QR</h3><p>Открыть сканирование</p></div>
+      </button>
+      <button class="card" id="report">
+        <div class="icon">▤</div><div><h3>Мой отчёт</h3><p>Результаты за день</p></div>
+      </button>
+      <button class="card card-wide" id="sales">
+        <div class="icon">🍾</div><div><h3>Продажи</h3><p>Заказы и количество бутылок</p></div>
+      </button>
+    </div>
+
+    <div class="sales">
+      <div class="sales-head"><div class="sales-title">Сегодня</div><div class="sales-link">LEGION TP 1.0</div></div>
+      <div class="metrics">
+        <div class="metric"><b id="orders">0</b><span>заказов</span></div>
+        <div class="metric"><b id="bottles">0</b><span>бутылок</span></div>
+      </div>
+    </div>
+    <div class="footer">LEGION ASIA DISTRIBUTION</div>
+  </main>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h2 id="modalTitle">Начать работу</h2>
+    <p id="modalText">На следующем этапе подключим сюда реальные функции текущего бота: фото, геолокацию и запись в базу.</p>
+    <div class="actions">
+      <button class="action primary" id="modalPrimary">Продолжить</button>
+      <button class="action secondary" id="modalClose">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const tg=window.Telegram?.WebApp;
+if(tg){try{tg.ready();tg.expand();tg.setHeaderColor('#c90000');tg.setBackgroundColor('#f4f5f7');}catch(e){}}
+const name=tg?.initDataUnsafe?.user?.first_name;
+const username=tg?.initDataUnsafe?.user?.username;
+if(name) document.getElementById('user').textContent=(username?'@'+username:name);
+let started=false, startAt=null;
+const modal=document.getElementById('modal'), title=document.getElementById('modalTitle'), text=document.getElementById('modalText');
+function openModal(t,desc,cb){title.textContent=t;text.textContent=desc;modal.style.display='flex';document.getElementById('modalPrimary').onclick=()=>{modal.style.display='none';cb&&cb()}}
+document.getElementById('modalClose').onclick=()=>modal.style.display='none';
+document.getElementById('start').onclick=()=>openModal('Начать рабочий день','Сейчас это демонстрационный экран. Подключение к существующему боту сделаем следующим этапом.',()=>{
+ started=true;startAt=new Date();document.getElementById('statusTitle').textContent='Рабочий день активен';document.getElementById('statusTime').textContent='Начат в '+startAt.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+});
+document.getElementById('finish').onclick=()=>openModal('Завершить рабочий день','На следующем этапе сюда перенесём фото и геолокацию из текущего бота.',()=>{
+ started=false;document.getElementById('statusTitle').textContent='Рабочий день завершён';document.getElementById('statusTime').textContent='До следующего рабочего дня';
+});
+document.getElementById('qr').onclick=()=>openModal('Сканер QR','Наш существующий QR Mini App уже работает. После подключения этой кнопки она будет открывать его напрямую.',()=>{});
+document.getElementById('report').onclick=()=>openModal('Мой отчёт','Здесь будет отчёт текущего торгового представителя: начало/конец, заказы, бутылки, фото и геолокация.',()=>{});
+document.getElementById('sales').onclick=()=>openModal('Продажи','Здесь сделаем простой ввод количества заказов и бутылок без сложной формы.',()=>{});
+document.getElementById('bell').onclick=()=>openModal('Уведомления','Здесь будут отображаться напоминания и сообщения от руководителя.',()=>{});
+</script>
+</body>
+</html>
